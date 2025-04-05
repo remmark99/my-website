@@ -1,11 +1,18 @@
+import Link from 'next/link'
 import React from 'react'
-import First from "@/notes/first.mdx";
+
+const links = [
+  {
+    title: "First note",
+    url: "/first"
+  }
+]
 
 export default function TILPage() {
   return (
-    <div className="prose">
-    <First />
-    </div>
+    <div>{
+      links.map((link) => <Link key={link.url} href={`til/${link.url}`}>{link.title}</Link>)
+    }</div>
   )
 }
 
