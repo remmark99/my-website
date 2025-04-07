@@ -1,18 +1,13 @@
 import dynamic from 'next/dynamic'
 
 interface Props {
-  params: { slug: string }
+  params: Promise<{ slug: string }>;
 }
-//
-// export async function generateStaticParams() {
-//   return [
-//     { slug: 'first' },
-//     { slug: 'second' }
-//   ]
-// }
 
-export default function TILNote({ params }: Props) {
-  const MDXContent = dynamic(() => import(`@/notes/${params.slug}.mdx`), {
+export default async function TILNote(props: Props) {
+  const { slug } = await props.params;
+
+  const MDXContent = dynamic(() => import(`@/notes/${slug}.mdx`), {
     loading: () => <p>Loading...</p>
   })
 

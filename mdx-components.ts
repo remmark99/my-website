@@ -1,5 +1,6 @@
 // This file is required to use @next/mdx in the `app` directory.
-export function useMDXComponents(components) {
+// TODO: don't know what the type is
+export function useMDXComponents(components: unknown) {
   return components
   // Allows customizing built-in components, e.g. to add styling.
   // return {
