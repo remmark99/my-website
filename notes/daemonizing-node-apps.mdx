@@ -1,0 +1,18 @@
+# Daemonizing Node apps
+
+### Chapter 1: The Problem
+
+So, you've got your project all done, palms sweating, waiting for your friends to try out your ligma ballz joke magnum opus website. You run `npm run build` and `npm run start` and voila - now you can't use your console anymore...
+
+![Why won't my favourite commands run???](/unresponsive_console.png)
+*Why won't my favourite commands run???*
+
+### Chapter 2: The Solution
+
+If you're a fellow christian - you should stop now. We're going to need help from the <span className="text-red-500 font-bold text-2xl">OTHER SIDE🔥😈</span> to fix that problem. What am I talking about? The **DAEMONS!!!**
+
+> In multitasking computer operating systems, a daemon is a computer program that runs as a background process, rather than being under the direct control of an interactive user.
+>>  \- **John 3:16 (CSB)**
+
+The one that came up first when I googled was pm2, which means it is definitely the best one.
+Install it with `npm i pm2 -g` and run with `pm2 start npm -- *script you want to run*`. In my case, the script was **start**.
