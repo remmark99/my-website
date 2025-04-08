@@ -1,50 +1,54 @@
-import Link from 'next/link'
-import React from 'react'
+import React from "react";
 import fs from "fs/promises";
-import { createReadStream } from 'fs';
-import path from 'path';
-import readline from 'readline';
+import NotesFilter from "@/components/notes-filter";
+import NotesList from "@/components/notes-list";
 
 // Once every minute, I want to get an updated list of notes
 export const revalidate = 60;
 
-async function getNoteTitle(note: string) {
-  const filePath = path.join(process.env.NOTES_FOLDER || "", note);
+async function getNoteMetadata(
+  note: string,
+): Promise<NoteMetadata | undefined> {
+  try {
+    const noteModule = await import(`@/notes/${note}`);
 
-  const fileStream = createReadStream(filePath);
-  const rl = readline.createInterface({
-    input: fileStream,
-    crlfDelay: Infinity,
-  });
-
-  for await (const line of rl) {
-    fileStream.close();
-
-    const match = line.match(/#\s*(.+)/);
-    return match ? match[1].trim() : note.split(".")[0];
+    return {
+      url: note.split(".")[0],
+      title: noteModule.title ?? note.split(".")[0],
+      tags: noteModule.tags ?? [],
+    };
+  } catch (error) {
+    console.error(`Error processing ${note}:`, error);
   }
-
-  return "This file is empty?!";
 }
 
-async function generateLinks() {
+async function generateNotesMedata() {
   const notes = await fs.readdir(process.env.NOTES_FOLDER || "");
 
-  const links = await Promise.all(notes.map(async (note) => ({
-    title: await getNoteTitle(note),
-    url: note.split(".")[0],
-  })));
+  const notesMetadata = await Promise.all(
+    notes.map(async (note) => getNoteMetadata(note)),
+  );
 
-  return links;
+  return notesMetadata.filter((note) => !!note);
+}
+
+function getTags(notesMetadata: NoteMetadata[]) {
+  const tags = new Set<string>();
+  for (const noteMetadata of notesMetadata) {
+    for (const tag of noteMetadata.tags) tags.add(tag);
+  }
+
+  return tags;
 }
 
 export default async function TILPage() {
-  const links = await generateLinks();
+  const notesMetadata = (await generateNotesMedata()) ?? [];
+  const tags = getTags(notesMetadata);
 
   return (
-    <div className='flex flex-col'>{
-      links.map((link) => <Link key={link.url} href={`til/${link.url}`}>{link.title}</Link>)
-    }</div>
-  )
+    <>
+      <NotesFilter tags={tags} />
+      <NotesList notes={notesMetadata} />
+    </>
+  );
 }
-

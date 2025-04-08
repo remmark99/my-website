@@ -1,0 +1,44 @@
+import Tag from "@/components/ui/tag";
+
+export const tags = ['next', 'react'];
+export const title = "Dynamic imports in NextJS";
+
+Imagine for a second that you're me. Wait, come back, what do you mean you're too lazy to read that?! You have a huge list of your TIL notes (currently 3) and you want to display them on your website. Also, you're using NextJS. 
+
+Naturally, you don't want to create a separate route for each and every note. You wan't to create a single `/[slug]/page.tsx` file that will display a note with matching filename. After googling a bit, you stumble upon a solution - `next/dynamic`:
+
+```
+  const MDXContent = dynamic(() => import(`@/${slug}.mdx`), {
+    loading: () => <p>Loading...</p>
+  });
+```
+
+And you know what? It works! Now you can create new notes right on your [server that you daemonized using that very cool tutorial you found on the internet](/til/daemonizing-node-apps) and edit them in real-time! Well, *almost*.
+
+### When life gives you lemons...
+
+Adding a new mdx file displays it in a list of notes you have (of course, given that you're as smart as I am), but when you open a new one, you get an <span className="text-red-500 font-bold">ERROR</span>. Since I'm a very respectable journalist, I was too lazy to take a screenshot, and recreating it with my big brain is impossible, since I never make the same mistake twice, so you'll have to trust me on that. The <span className="text-red-500 font-bold">ERROR</span> was very scary and nigh impossible to fix. Given that I couldn't do that, it's safe to say that no one can.
+
+Oh, you might be wondering what's causing the issue. Well, it will take you ages to find that there is actually an answer to that question, but it is so well hidden that you have no hope of finding it yourself. Thankfully, I'm here to help. Apparently, you can't use template strings or variables in dynamic imports:
+
+![Literally impossible to find on your own](/impossible_to_see.png)
+*Literally impossible to find on your own*
+
+What do you do in case something doesn't work? You try something else!
+
+### Something else
+
+Apparently, there is an `import()` function in React. It returns a `Promise` with module that you're trying to load. And that's exactly what we need! Now you can just asynchronously load your mdx file and display it to your imaginary friends:
+```ts
+  const {
+    default: MDXContent,
+    title,
+    tags,
+  } = await import(`@/notes/${slug}.mdx`);
+```
+
+Default is the default export (duh), and non-default exports are everything else.
+
+### And what's the difference???
+
+Well, first of all `dynamic()` is next specific, while `import()` is React stuff. Secondly, `import()` is exactly what we need for that type of job, and `dynamic()` is when you want to load something lazily - hidden popover or form, or maybe a header that is not needed on the first render. Plus, `dynamic()` has some Next stuff built into it, so it handles loading and SSR for ya.
