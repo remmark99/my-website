@@ -1,0 +1,43 @@
+export const title = "22 Penetrations";
+export const tags = ["linux"];
+
+Did you know you're more popular than you think? Well, not *you* - your server with an open port 22. 
+
+Let's play a game. Run this:
+```sh
+# Sends your credit card information to hackers
+sudo lastb | wc - l 
+```
+If your number is bigger than mine, you win.
+
+![lastb output](/lastb_number.png)
+*My score - yours is probably worse*
+
+Wait, you "won"? Congrats! That means over *18317* random Algerian kids (speaking from personal experience) tried to SSH into your server. And that's just from <span className="text-2xl font-bold text-red-500">3 DAYS</span> of leaving port 22 open.
+
+## What Now?
+
+<s>Burn your server, flee to the Amazon, and live off-grid. Hackers can't touch you if you're a hermit.</s>
+
+*Just change your ssh port.* Everyone and their mama is trying to connect via port 22, but no one is going to try connect via a port that is same to your CVC (*unless it's 022*).
+
+### I. First, let's edit your ssh configuration file:
+```sh
+# Opens the file without the possibility of closing it
+sudo vim /etc/ssh/sshd_config
+```
+
+Simply add a new line with your desired port:
+![Edited sshd_config](/ssh_config.png)
+*4-th line from bottom or 14-th line from top if you can't count from bottom*
+
+### II. Restart SSH:
+```sh
+sudo service ssh restart
+```
+
+### III. Oops, the Firewall Blocked You 😭
+Well, tough luck, kid. I ain't that smart to know how to do that, so you're on your own.
+
+### IIII. Alternative Solution
+Try [fail2ban](https://github.com/fail2ban/fail2ban) - it auto-blocks brute-forcers.
