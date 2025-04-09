@@ -10,12 +10,15 @@ async function getNoteMetadata(
   note: string,
 ): Promise<NoteMetadata | undefined> {
   try {
+    const filePath = `${process.env.NOTES_FOLDER ?? ""}/${note}`;
     const noteModule = await import(`@/notes/${note}`);
+    const { birthtime: createdAt } = await fs.stat(filePath);
 
     return {
       url: note.split(".")[0],
       title: noteModule.title ?? note.split(".")[0],
       tags: noteModule.tags ?? [],
+      createdAt,
     };
   } catch (error) {
     console.error(`Error processing ${note}:`, error);
@@ -44,6 +47,8 @@ function getTags(notesMetadata: NoteMetadata[]) {
 export default async function TILPage() {
   const notesMetadata = (await generateNotesMedata()) ?? [];
   const tags = getTags(notesMetadata);
+
+  notesMetadata.sort((a, b) => +b.createdAt - +a.createdAt);
 
   return (
     <>

@@ -1,6 +1,7 @@
 "use client";
 
 import { selectedTagsAtom } from "@/app/atoms";
+import { format } from "date-fns";
 import { useAtom } from "jotai";
 import Link from "next/link";
 import React from "react";
@@ -21,7 +22,7 @@ export default function NotesList({ notes }: Props) {
     <div className="flex flex-col">
       {filteredNotes.map((note) => (
         <Link key={note.url} href={`til/${note.url}`}>
-          {note.title}
+          {note.title} - {format(note.createdAt, "dd.MM.yy")}
         </Link>
       ))}
     </div>
